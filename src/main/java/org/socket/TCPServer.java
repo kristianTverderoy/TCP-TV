@@ -14,15 +14,15 @@ public class TCPServer {
     private int port;
     private ServerSocket serverSocket;
     private boolean isOn = false;
+    private int channel = 1;
 
-    public TCPServer(String host, int port){
+    public TCPServer( String host, int port){
         this.host = host;
         this.port = port;
         this.serverSocket = createServerSocket();
         bindServerSocket();
 
     }
-
 
 
     private ServerSocket createServerSocket(){
@@ -76,19 +76,18 @@ public class TCPServer {
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-            String command;
+            String inputLine;
             // This loop keeps reading commands until client disconnects or sends EXIT
-            while ((command = in.readLine()) != null) {
+            while ((inputLine = in.readLine()) != null) {
 
-
-                String response;
-
-                    response = executeCommand(command);
+                int commandCode = Integer.parseInt(inputLine.trim());
+                Commands command = Commands.fromIntValue(commandCode);
+                String response = executeCommand(command);
 
                 out.println(response);
 
                 // Only break the loop if EXIT command received
-                if ("EXIT".equalsIgnoreCase(command)) {
+                if (command == Commands.EXIT) {
                     break;
                 }
             }
@@ -103,37 +102,74 @@ public class TCPServer {
         }
     }
 
-
-    private String executeCommand(String command) {
-        switch (command.toUpperCase()) {
-            case "HELP":
-                return "Available commands: TURN ON, TURN OFF, STATUS, CHANGE CHANNEL, EXIT";
-            case "TURN ON":
+    private String executeCommand(Commands command) {
+        switch (command) {
+            case HELP:
+                return "Available commands: 'HELP(1)', 'TURN ON(2)', 'TURN OFF(3)', 'STATUS(4)', 'GET ACTIVE CHANNEL(5)'" +
+                        ", 'CHANNEL_1(6)', 'CHANNEL_2(7)', 'CHANNEL_3(8)' 'CHANNEL_4(9)' 'CHANNEL_5(10)' 'EXIT(0)'";
+            case TURN_ON:
                 if (!isOn) {
                     isOn = true;
                     return "TV turned ON";
                 } else {
                     return "TV is already ON";
                 }
-            case "TURN OFF":
+            case TURN_OFF:
                 if (isOn) {
                     isOn = false;
                     return "TV turned OFF";
                 } else {
                     return "TV is already OFF";
                 }
-            case "STATUS":
+            case STATUS:
                 return "TV is " + (isOn ? "ON" : "OFF");
 
-            case "CHANGE CHANNEL":
+                case GET_CHANNEL:
                 if (isOn) {
-                    return "Which channel would you like to switch to? Available channels: 1, 2, 3, 4, 5.";
+                    return "Current channel is " + this.channel;
+                } else {
+                    return "TV is OFF. No active channel.";
+                }
+
+            case CHANNEL_1:
+                if (isOn) {
+                    this.channel = 1;
+                    return "Switched to Channel 1: NRK";
                 } else {
                     return "TV is OFF. Cannot change channel.";
                 }
 
+            case CHANNEL_2:
+                if (isOn) {
+                    this.channel = 2;
+                    return "Switched to Channel 2: National Geographic";
+                } else {
+                    return "TV is OFF. Cannot change channel.";
+                }
+            case CHANNEL_3:
+                if (isOn) {
+                    this.channel = 3;
+                    return "Switched to Channel 3: Discovery Channel";
+                } else {
+                    return "TV is OFF. Cannot change channel.";
+                }
+            case CHANNEL_4:
+                if (isOn) {
+                    this.channel = 4;
+                    return "Switched to Channel 4: HBO";
+                } else {
+                    return "TV is OFF. Cannot change channel.";
+                }
+            case CHANNEL_5:
+                if (isOn) {
+                    this.channel = 5;
+                    return "Switched to Channel 5: TV2";
+                } else {
+                    return "TV is OFF. Cannot change channel.";
+                }
 
-
+            case EXIT:
+                return "Exiting. Goodbye!";
 
 
             default:
@@ -152,6 +188,8 @@ public class TCPServer {
         }
         return port;
     }
+
+
 
 
 

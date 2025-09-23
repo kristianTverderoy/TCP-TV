@@ -14,6 +14,7 @@ public class TCPClient {
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
+    private boolean disclaimerShown = false;
 
     public TCPClient(String host, int port){
         this.host = host;
@@ -26,9 +27,9 @@ public class TCPClient {
         System.out.println("Client started. Connecting to " + host + ":" + port);
         boolean keepRunning = true;
         while (keepRunning){
-            String command = readCommandToSend();
-            if (command.equals("EXIT")){
-                sendCommand("EXIT");
+            Commands command = readCommandToSend();
+            if (command == Commands.EXIT){
+                sendCommand(command);
                 keepRunning = false;
                 System.out.println("Exiting client.");
             } else {
@@ -56,9 +57,9 @@ public class TCPClient {
             System.err.println("Error closing connection: " + e.getMessage());
         }
     }
-    public String sendCommand(String command){
+    public String sendCommand(Commands command){
         try {
-            this.out.println(command);
+            this.out.println(command.getCode());
             return this.in.readLine();
         } catch (IOException e){
             System.err.println("Error sending command: " + e.getMessage());
@@ -76,14 +77,26 @@ public class TCPClient {
         }
     }
 
-        public String readCommandToSend(){
+        public Commands readCommandToSend(){
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter command (type 'HELP' for available commands): ");
-        return scanner.nextLine().trim().toUpperCase();
-    }
+        if (!disclaimerShown) {
+            System.out.println("DISCLAIMER! This system uses numbers instead of words as input." +
+                    " Please input the corresponding number to each command!\n" +
+                    "Enter command (type '1' for available commands): ");
+            disclaimerShown = true;
+        }
+
+        try {
+            int input = Integer.parseInt(scanner.nextLine().trim().toUpperCase());
+            return Commands.fromIntValue(input);
+        } catch (IllegalArgumentException e){
+            System.out.println("Invalid command. Please try again.");
+            return readCommandToSend();
+        }
+        }
 
     public String getAvailableCommands(){
-        return sendCommand("HELP");
+        return sendCommand(Commands.HELP);
     }
 
 }

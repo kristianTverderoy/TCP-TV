@@ -105,8 +105,17 @@ public class TCPServer {
     private String executeCommand(Commands command) {
         switch (command) {
             case HELP:
-                return "Available commands: 'HELP(1)', 'TURN ON(2)', 'TURN OFF(3)', 'STATUS(4)', 'GET ACTIVE CHANNEL(5)'" +
-                        ", 'CHANNEL_1(6)', 'CHANNEL_2(7)', 'CHANNEL_3(8)' 'CHANNEL_4(9)' 'CHANNEL_5(10)' 'EXIT(0)'";
+                return "Available commands: 'HELP(" + Commands.getCommandCode(String.valueOf(Commands.HELP)) + ")', " +
+                    "'TURN ON(" + Commands.getCommandCode(String.valueOf(Commands.TURN_ON)) + ")', " +
+                    "'TURN OFF(" + Commands.getCommandCode(String.valueOf(Commands.TURN_OFF)) + ")', " +
+                    "'STATUS(" + Commands.getCommandCode(String.valueOf(Commands.STATUS)) + ")', " +
+                    "'GET ACTIVE CHANNEL(" + Commands.getCommandCode(String.valueOf(Commands.GET_CHANNEL)) + ")', " +
+                    "'CHANNEL_1(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_1)) + ")', " +
+                    "'CHANNEL_2(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_2)) + ")', " +
+                    "'CHANNEL_3(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_3)) + ")', " +
+                    "'CHANNEL_4(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_4)) + ")', " +
+                    "'CHANNEL_5(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_5)) + ")', " +
+                    "'EXIT(" + Commands.getCommandCode(String.valueOf(Commands.EXIT)) + ")'";
             case TURN_ON:
                 if (!isOn) {
                     isOn = true;
@@ -121,6 +130,10 @@ public class TCPServer {
                 } else {
                     return "TV is already OFF";
                 }
+            case TURN_ON_OR_OFF:
+                isOn = !isOn;
+                return "TV turned " + (isOn ? "ON" : "OFF");
+
             case STATUS:
                 return "TV is " + (isOn ? "ON" : "OFF");
 
@@ -129,6 +142,22 @@ public class TCPServer {
                     return "Current channel is " + this.channel;
                 } else {
                     return "TV is OFF. No active channel.";
+                }
+
+            case CHANNEL_UP:
+                if (isOn) {
+                    this.channel = (this.channel % 5) + 1; // Wrap around after channel 5
+                    return "Channel increased to " + this.channel;
+                } else {
+                    return "TV is OFF. Cannot change channel.";
+                }
+
+            case CHANNEL_DOWN:
+                if (isOn) {
+                    this.channel = (this.channel == 1) ? 5 : this.channel - 1; // Wrap around to channel 5 if at channel 1
+                    return "Channel decreased to " + this.channel;
+                } else {
+                    return "TV is OFF. Cannot change channel.";
                 }
 
             case CHANNEL_1:

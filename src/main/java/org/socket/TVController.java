@@ -56,8 +56,20 @@ public class TVController {
     }
 
     Commands readCommand(){
-        System.out.println("Available commands: 'HELP(1)', 'TURN ON(2)', 'TURN OFF(3)', 'STATUS(4)', 'GET ACTIVE CHANNEL(5)'" +
-        ", 'CHANNEL_1(6)', 'CHANNEL_2(7)', 'CHANNEL_3(8)' 'CHANNEL_4(9)' 'CHANNEL_5(10)' 'EXIT(0)'");
+        System.out.println("Available commands:\n'HELP(" + Commands.getCommandCode(String.valueOf(Commands.HELP)) + ")', " +
+                "'TURN ON(" + Commands.getCommandCode(String.valueOf(Commands.TURN_ON)) + ")', " +
+                "'TURN OFF(" + Commands.getCommandCode(String.valueOf(Commands.TURN_OFF)) + ")', " +
+                "'TURN ON/OFF(" + Commands.getCommandCode(String.valueOf(Commands.TURN_ON_OR_OFF)) + ")', " +
+                "\n'STATUS(" + Commands.getCommandCode(String.valueOf(Commands.STATUS)) + ")', " +
+                "'CHANNEL UP(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_UP)) + ")', " +
+                "'CHANNEL DOWN(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_DOWN)) + ")', " +
+                "'GET ACTIVE CHANNEL(" + Commands.getCommandCode(String.valueOf(Commands.GET_CHANNEL)) + ")', " +
+                "\n'CHANNEL_1(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_1)) + ")', " +
+                "'CHANNEL_2(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_2)) + ")', " +
+                "'CHANNEL_3(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_3)) + ")', " +
+                "'CHANNEL_4(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_4)) + ")', " +
+                "\n'CHANNEL_5(" + Commands.getCommandCode(String.valueOf(Commands.CHANNEL_5)) + ")', " +
+                "'EXIT(" + Commands.getCommandCode(String.valueOf(Commands.EXIT)) + ")'");
         try {
             int input = Integer.parseInt(this.scanner.nextLine().trim());
             return Commands.fromIntValue(input);

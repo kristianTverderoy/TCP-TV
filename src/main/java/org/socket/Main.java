@@ -1,6 +1,19 @@
 package org.socket;
 
+/**
+ * Main entry point for the TV control application.
+ * This class initializes the TCP servers for TVs, creates the TV manager,
+ * and starts the interactive TV controller.
+ */
 public class Main {
+    /**
+     * Application entry point. Sets up and starts TCP servers for TVs,
+     * initializes TV management, and launches the interactive controller.
+     *
+     * @param args Command line arguments:
+     *             args[0] - Host address (default: 127.0.0.1)
+     *             args[1] - Port number (default: 1238)
+     */
     public static void main(String[] args) {
         String host = "127.0.0.1";
         if (args.length >= 1) {

@@ -1,5 +1,9 @@
 package org.socket;
 
+/**
+ * Represents commands that can be sent to TV devices.
+ * Each command has an associated numeric code for transmission over the network.
+ */
 public enum Commands {
     HELP(1),
     TURN_ON(2),
@@ -18,19 +22,42 @@ public enum Commands {
 
     private final int code;
 
-    Commands(int intValue) {
+    /**
+     * Constructs a command with the specified numeric code.
+     *
+     * @param intValue The numeric code for this command
+     */    Commands(int intValue) {
         this.code = intValue;
     }
 
+    /**
+     * Gets the numeric code for a command by its name.
+     *
+     * @param fieldName The name of the command
+     * @return The numeric code associated with the command
+     * @throws IllegalArgumentException If the fieldName does not match any command
+     */
     public static int getCommandCode(String fieldName){
             return Commands.valueOf(fieldName).getCode();
 
     }
 
+    /**
+     * Gets the numeric code for this command.
+     *
+     * @return The command's numeric code
+     */
     public int getCode() {
         return code;
     }
 
+    /**
+     * Finds a command by its numeric code.
+     *
+     * @param intValue The numeric code to look up
+     * @return The command associated with the numeric code
+     * @throws IllegalArgumentException If no command matches the provided code
+     */
     public static Commands fromIntValue(int intValue) {
         for (Commands command : Commands.values()) {
             if (command.getCode() == intValue) {

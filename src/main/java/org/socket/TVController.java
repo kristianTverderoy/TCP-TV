@@ -4,21 +4,34 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * A controller class for TV management that provides a command-line interface
+ * for interacting with available TVs through a TVManager.
+ * This class handles TV selection and command execution.
+ */
 public class TVController {
     private TVManager tvManager;
     private Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Constructs a new TVController with the specified TVManager.
+     *
+     * @param tvManager The TV manager to use for TV operations
+     */
     public TVController(TVManager tvManager){
         this.tvManager = tvManager;
     }
 
+    /**
+     * Starts the interactive TV control session.
+     * Runs in a loop allowing users to select TVs and issue commands until EXIT is selected.
+     */
     public void start(){
         boolean running = true;
         while (running) {
             String tvName = selectTv();
             if (tvName == null) {
                 running = false;
-                continue;
             }
 
             Commands command = readCommand();
@@ -31,6 +44,11 @@ public class TVController {
         }
     }
 
+    /**
+     * Displays available TVs and prompts the user to select one.
+     *
+     * @return The selected TV name, or null if no TV was selected or if input was invalid
+     */
     private String selectTv(){
         List<String> tvNames = tvManager.getTCPServerNames();
         if (tvNames.isEmpty()) {
@@ -55,6 +73,12 @@ public class TVController {
         }
     }
 
+    /**
+     * Displays available commands and prompts the user to select one.
+     * Handles numeric input for command selection.
+     *
+     * @return The selected command, defaults to HELP if input is invalid
+     */
     Commands readCommand(){
         System.out.println("Available commands:\n'HELP(" + Commands.getCommandCode(String.valueOf(Commands.HELP)) + ")', " +
                 "'TURN ON(" + Commands.getCommandCode(String.valueOf(Commands.TURN_ON)) + ")', " +

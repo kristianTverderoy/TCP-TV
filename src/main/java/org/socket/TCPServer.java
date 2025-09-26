@@ -8,6 +8,11 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * A TCP server that simulates a Smart TV device.
+ * This server listens for client connections and processes commands to control
+ * the TV's power state and channel selection.
+ */
 public class TCPServer {
 
     private String host;
@@ -16,6 +21,13 @@ public class TCPServer {
     private boolean isOn = false;
     private int channel = 1;
 
+    /**
+     * Constructs a new TCP server with the specified host and port.
+     * Creates and binds a server socket during initialization.
+     *
+     * @param host The hostname or IP address to bind to
+     * @param port The port number to bind to
+     */
     public TCPServer( String host, int port){
         this.host = host;
         this.port = port;
@@ -25,6 +37,11 @@ public class TCPServer {
     }
 
 
+    /**
+     * Creates a new server socket.
+     *
+     * @return A new ServerSocket instance, or null if creation fails
+     */
     private ServerSocket createServerSocket(){
         ServerSocket serverSocket = null;
         try {
@@ -36,6 +53,10 @@ public class TCPServer {
         return serverSocket;
     }
 
+    /**
+     * Binds the server socket to the configured host and port.
+     * If the server socket is null or closed, a new one is created first.
+     */
     public void bindServerSocket(){
         try{
             if (this.serverSocket == null || this.serverSocket.isClosed()) {
@@ -49,6 +70,10 @@ public class TCPServer {
 
     }
 
+    /**
+     * Starts the server and begins listening for client connections.
+     * Processes client commands until an EXIT command is received or an error occurs.
+     */
     public void start() {
         if (this.serverSocket == null || !(this.serverSocket.isBound())) {
             System.err.println("Server socket is not bound or is closed.");
@@ -71,6 +96,12 @@ public class TCPServer {
         }
     }
 
+    /**
+     * Processes incoming client requests by reading commands and sending responses.
+     * Executes the received commands and returns appropriate responses.
+     *
+     * @param clientSocket The socket connection to the client
+     */
     private void processClientRequest(Socket clientSocket) {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -102,6 +133,12 @@ public class TCPServer {
         }
     }
 
+    /**
+     * Executes a TV command and returns the appropriate response message.
+     *
+     * @param command The command to execute
+     * @return A string response describing the result of the command
+     */
     private String executeCommand(Commands command) {
         switch (command) {
             case HELP:
@@ -206,10 +243,22 @@ public class TCPServer {
         }
     }
 
+    /**
+     * Gets the power state of the TV.
+     *
+     * @return true if the TV is on, false if it's off
+     */
     public boolean isOn() {
         return this.isOn;
     }
 
+    /**
+     * Gets the port number the server is bound to.
+     * If the server socket is bound, returns its actual local port,
+     * otherwise returns the configured port.
+     *
+     * @return The port number
+     */
     public int getPort(){
         int port = this.port;
         if (serverSocket != null && serverSocket.isBound()){

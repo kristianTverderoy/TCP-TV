@@ -7,6 +7,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+/**
+ * A TCP client implementation for socket-based communication with a server.
+ * This class handles creating connections, sending commands, and receiving responses.
+ */
 public class TCPClient {
 
     private int port;
@@ -16,13 +20,23 @@ public class TCPClient {
     private BufferedReader in;
     private boolean disclaimerShown = false;
 
+    /**
+     * Constructs a new TCP client with the specified host and port.
+     * Automatically creates a socket connection upon instantiation.
+     *
+     * @param host The hostname or IP address of the server
+     * @param port The port number of the server
+     */
     public TCPClient(String host, int port){
         this.host = host;
         this.port = port;
         createSocket();
-
     }
 
+    /**
+     * Starts the client operation, reading and sending commands in a loop
+     * until the EXIT command is issued.
+     */
     public void start(){
         System.out.println("Client started. Connecting to " + host + ":" + port);
         boolean keepRunning = true;
@@ -41,6 +55,9 @@ public class TCPClient {
         System.out.println("Client stopped.");
     }
 
+    /**
+     * Closes all open connections and resources.
+     */
     public void closeConnection(){
         try {
             if (this.socket != null && !this.socket.isClosed()) {
@@ -57,6 +74,13 @@ public class TCPClient {
             System.err.println("Error closing connection: " + e.getMessage());
         }
     }
+
+    /**
+     * Sends a command to the server and returns the response.
+     *
+     * @param command The command to send
+     * @return The server's response string
+     */
     public String sendCommand(Commands command){
         try {
             this.out.println(command.getCode());
@@ -67,6 +91,10 @@ public class TCPClient {
         }
     }
 
+    /**
+     * Creates a socket connection to the server using the specified host and port.
+     * Initializes input and output streams for communication.
+     */
     public void createSocket() {
         try {
             this.socket = new Socket(this.host, this.port);
@@ -77,6 +105,12 @@ public class TCPClient {
         }
     }
 
+    /**
+     * Reads user input to determine which command to send to the server.
+     * Displays a disclaimer about using numeric inputs on first use.
+     *
+     * @return The selected command
+     */
         public Commands readCommandToSend(){
         Scanner scanner = new Scanner(System.in);
         if (!disclaimerShown) {
@@ -95,6 +129,11 @@ public class TCPClient {
         }
         }
 
+    /**
+     * Retrieves the list of available commands from the server.
+     *
+     * @return A string containing available commands
+     */
     public String getAvailableCommands(){
         return sendCommand(Commands.HELP);
     }

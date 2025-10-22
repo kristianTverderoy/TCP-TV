@@ -16,9 +16,11 @@ public class TCPClient {
     private int port;
     private String host;
     private Socket socket;
+    private Socket broadcastSocket;
     private PrintWriter out;
     private BufferedReader in;
     private boolean disclaimerShown = false;
+    private volatile boolean running = true;
 
     /**
      * Constructs a new TCP client with the specified host and port.
@@ -33,35 +35,63 @@ public class TCPClient {
         createSocket();
     }
 
-    /**
-     * Starts the client operation, reading and sending commands in a loop
-     * until the EXIT command is issued.
-     */
-    public void start(){
-        System.out.println("Client started. Connecting to " + host + ":" + port);
-        boolean keepRunning = true;
-        while (keepRunning){
-            Commands command = readCommandToSend();
-            if (command == Commands.EXIT){
-                sendCommand(command);
-                keepRunning = false;
-                System.out.println("Exiting client.");
-            } else {
-                String response = sendCommand(command);
-                System.out.println("Response: " + response);
+    public void startBroadcastListener() {
+        running = true;
+        //Separate thread to listen for changes made by other clients.
+        try {
+            this.broadcastSocket = new Socket(this.host, (this.port + 10000));
+            Thread listenerThread = new Thread(this::listenForBroadcasts);
+            listenerThread.setDaemon(true);
+            listenerThread.start();
+        } catch (IOException e) {
+            System.err.println("Error connecting to broadcast socket: " + e.getMessage());
+        }
+    }
+
+
+    private void listenForBroadcasts() {
+        try {
+            BufferedReader broadcastIn = new BufferedReader(
+                    new InputStreamReader(broadcastSocket.getInputStream()));
+
+            while (running) {
+                try {
+                    String broadcast = broadcastIn.readLine();
+                    if (broadcast != null) {
+                        System.out.println("\n" + "=".repeat(50));
+                        System.out.println("*** BROADCAST: " + broadcast + " ***");
+                        System.out.println("=".repeat(50));
+                        System.out.print("\nEnter command: ");
+                    }
+                } catch (IOException e) {
+                    if (running) {
+                        System.err.println("Error receiving broadcast: " + e.getMessage());
+                        try {
+                            Thread.sleep(1000); // Avoid tight loop on error
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            if (running) {
+                System.err.println("Error in broadcast listener: " + e.getMessage());
             }
         }
-        closeConnection();
-        System.out.println("Client stopped.");
     }
 
     /**
      * Closes all open connections and resources.
      */
-    public void closeConnection(){
+    public void closeConnection() {
+        running = false;
         try {
             if (this.socket != null && !this.socket.isClosed()) {
                 this.socket.close();
+            }
+            if (this.broadcastSocket != null && !this.broadcastSocket.isClosed()) {
+                this.broadcastSocket.close();
             }
             if (this.out != null) {
                 this.out.close();
@@ -69,9 +99,9 @@ public class TCPClient {
             if (this.in != null) {
                 this.in.close();
             }
-                System.out.println("Connection closed.");
-        } catch (IOException e){
-            System.err.println("Error closing connection: " + e.getMessage());
+            System.out.println("Connections closed.");
+        } catch (IOException e) {
+            System.err.println("Error closing connections: " + e.getMessage());
         }
     }
 

@@ -21,7 +21,9 @@ public class TVManager {
      */
     public void addTV(TV tv) {
         this.servers.put(tv.getName(), tv);
-        this.clients.put(tv.getName(), new TCPClient(tv.getHost(), tv.getPort()));
+        TCPClient client = new TCPClient(tv.getHost(), tv.getPort());
+        this.clients.put(tv.getName(), client);
+        client.startBroadcastListener();
     }
 
     /**

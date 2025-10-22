@@ -32,22 +32,27 @@ public class Main {
             }
         }
         System.out.println(host + ":" + port);
+        System.out.println("Port 1: " + port);
+        System.out.println("Port 2: " + (port + 1));
+        System.out.println("Port 3: " + (port + 2));
 
-        TCPServer tv1Server = new TCPServer(host, port);
-//        TCPServer tv2Server = new TCPServer(host, port);
-//        TCPServer tv3Server = new TCPServer(host, port);
 
-        Thread tv1Thread = new Thread(tv1Server::start);
-//        Thread tv2Thread = new Thread(tv2Server::start);
-//        Thread tv3Thread = new Thread(tv3Server::start);
-        tv1Thread.start();
-//        tv2Thread.start();
-//        tv3Thread.start();
+        TCPServer tvServerPort2005 = new TCPServer(host, (port), 6);
+        TCPServer tvServerPort3001 = new TCPServer(host, (port + 1), 4);
+        TCPServer tvServerPort5060 = new TCPServer(host, (port + 2), 2);
+
+        Thread tvServerPort2005Thread = new Thread(tvServerPort2005::start);
+        Thread tvServerPort3001Thread = new Thread(tvServerPort3001::start);
+        Thread tvServerPort5060Thread = new Thread(tvServerPort5060::start);
+
+        tvServerPort2005Thread.start();
+        tvServerPort3001Thread.start();
+        tvServerPort5060Thread.start();
 
         TVManager tvManager = new TVManager();
-        tvManager.addTV(new TV("Master bedroom", host, tv1Server.getPort()));
-//        tvManager.addTV(new TV("Living room", host, tv2Server.getPort()));
-//        tvManager.addTV(new TV("Kitchen", host, tv3Server.getPort()));
+        tvManager.addTV(new TV("Master bedroom", host, tvServerPort2005.getPort()));
+        tvManager.addTV(new TV("Living room", host, tvServerPort3001.getPort()));
+        tvManager.addTV(new TV("Kitchen", host, tvServerPort5060.getPort()));
 
         TVController controller = new TVController(tvManager);
         controller.start();
